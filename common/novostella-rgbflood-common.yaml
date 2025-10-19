@@ -1,0 +1,46 @@
+# Common code for Novostella 25w RGB flood lights
+# found them on eBay. Unlikely to get more because I can't find them.
+substitutions:
+  project_name: PB.Novostella_25w_RGB_Flood # Project info. The format of the name should be 'author_name.project_name'
+  project_ver_num: "1.0"
+  project_ver_let: a
+  light_restore_mode: "RESTORE_AND_OFF"
+
+packages:
+  light-effects-config: !include ../common/light-effects-config.yaml # Default light effects config
+  wifi-boot-script-common: !include wifi-boot-script-common.yaml
+
+bk72xx:
+  board: wb3s
+
+esphome:
+  name: novostella-rgbflood
+  project:  # Project info
+    name: $project_name
+    version: $project_ver_num($project_ver_let)
+
+# Output components
+output:
+  - platform: libretiny_pwm
+    id: output_red
+    pin: 24
+    max_power: ${max_brightness_pwm}
+  - platform: libretiny_pwm
+    id: output_green
+    pin: 6
+    max_power: ${max_brightness_pwm}
+  - platform: libretiny_pwm
+    id: output_blue
+    pin: 26
+    max_power: ${max_brightness_pwm}
+# Main light component
+light:
+  - platform: rgb
+    id: thelight
+    icon: mdi:light-flood-up
+    name: ${friendly_name}
+    restore_mode: ${light_restore_mode}
+    red: output_red
+    green: output_green
+    blue: output_blue
+    effects: !include ../common/light-effects-common-list.yaml

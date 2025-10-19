@@ -1,0 +1,25 @@
+web_server:
+  version: 3
+  port: 80
+  include_internal: ${web_server_show_internal}
+  # Custom handler for syncing time from browser
+  handlers:
+    - uri: /setup
+      method: POST
+      handler: |-
+        if (request->hasParam("epoch", true) && request->hasParam("tz", true)) {
+          int epoch = request->getParam("epoch", true)->value().toInt();
+          std::string tz = request->getParam("tz", true)->value().c_str();
+
+          id(sntp_time).set_timezone(tz.c_str());
+          id(sntp_time).set_epoch(epoch);
+
+          if (request->hasParam("name", true)) {
+            std::string name = request->getParam("name", true)->value().c_str();
+            id(bulb_name) = name;
+          }
+
+          request->send(200, "text/plain", "Setup complete: time + name set");
+        } else {
+          request->send(400, "text/plain", "Missing params (epoch & tz required)");
+        }

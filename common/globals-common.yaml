@@ -1,0 +1,17 @@
+globals:
+  - id: bulb_name
+    type: std::string
+    restore_value: true
+    initial_value: "PB Factory Bulb"
+  - id: static_ip
+    type: std::string
+    restore_value: true
+    initial_value: ""
+  - id: static_gateway
+    type: std::string
+    restore_value: true
+    initial_value: ""
+  - id: static_subnet
+    type: std::string
+    restore_value: true
+    initial_value: ""

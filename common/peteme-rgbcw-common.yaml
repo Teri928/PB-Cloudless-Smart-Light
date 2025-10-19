@@ -1,0 +1,67 @@
+# Common code for Peteme A19 RGBCW bulbs
+# https://a.co/d/hC6o2q6
+substitutions:
+  project_name: PB.Peteme_RGBCW_A19_bulb # Project info. The format of the name should be 'author_name.project_name'
+  project_ver_num: "1.0"
+  project_ver_let: a
+  light_restore_mode: "RESTORE_AND_OFF"
+
+packages:
+  light-effects-config: !include ../common/light-effects-config.yaml # Default light effects config
+  wifi-boot-script-common: !include wifi-boot-script-common.yaml
+
+bk72xx:
+  board: wb3l
+
+esphome:
+  name: petemebulb-rgbcw
+  project:  # Project info
+    name: $project_name
+    version: $project_ver_num($project_ver_let)
+
+# Output components
+output:
+  - platform: libretiny_pwm
+    id: output_red
+    pin: 8
+    max_power: ${max_brightness_pwm}
+  - platform: libretiny_pwm
+    id: output_green
+    pin: 24
+    max_power: ${max_brightness_pwm}
+  - platform: libretiny_pwm
+    id: output_blue
+    pin: 26
+    max_power: ${max_brightness_pwm}
+  - platform: libretiny_pwm
+    id: output_cold
+    pin: 7
+    max_power: ${max_brightness_pwm}
+  - platform: libretiny_pwm
+    id: output_warm
+    pin: 6
+    max_power: ${max_brightness_pwm}
+    # inverted: true  # color temp kelvins are inverted in Home Assistant on some BR30 bulb. If color temp is backwards, change this.
+
+# Main light component
+light:
+  - platform: rgbww
+    id: thelight
+    name: ${friendly_name}
+    restore_mode: ${light_restore_mode}
+    color_interlock: true
+    cold_white_color_temperature: 6500 K
+    warm_white_color_temperature: 2700 K
+    red: output_red
+    green: output_green
+    blue: output_blue
+    cold_white: output_cold
+    warm_white: output_warm
+    effects: !include ../common/light-effects-common-list.yaml
+
+# text_sensor:  #mostly obsolete. Debug device info reports the same stuff
+#   # Reports the LibreTiny Versions with compile date
+#   - platform: libretiny
+#     version:
+#       name: LibreTiny Version
+#       entity_category: diagnostic
