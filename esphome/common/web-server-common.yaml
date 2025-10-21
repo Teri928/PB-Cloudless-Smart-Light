@@ -1,3 +1,5 @@
+substitutions:
+  web_server_show_internal: "false" # default false, set in parent config
 web_server:
   version: 3
   port: 80
