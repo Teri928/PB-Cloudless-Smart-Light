@@ -2,17 +2,12 @@ substitutions:
   blackout_time_start: '8'
   blackout_time_end: '20'
 
-# Grab time from homeassistant and setup blackout time for flashing
-time:
-  - platform: homeassistant
-    id: hasstime
-
 binary_sensor:
   - platform: template
     id: outside_blackout_time
     internal: true
     lambda: |-
-      auto now = id(hasstime).now();
+      auto now = id(sntp_time).now();
       int start = atoi("${blackout_time_start}");
       int end = atoi("${blackout_time_end}");
       if (start > end) {
@@ -36,7 +31,7 @@ esphome:
       - script.execute: restore_light_state
       # - light.turn_off: thelight
 
-wifi:  
+wifi:
   on_disconnect:
     then:
       - logger.log: "WiFi Disconnected!"

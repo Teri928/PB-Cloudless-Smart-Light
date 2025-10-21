@@ -1,0 +1,73 @@
+output:
+  # Bit bucket (absorbs writes from dummy light)
+  - platform: template
+    id: bit_bucket
+    type: float
+    write_action:
+      - lambda: |-
+          // Do nothing
+
+light:
+  - id: !extend thelight
+    on_state:
+      - lambda: id(number_color_temperature).publish_state((id(thelight).remote_values.get_color_temperature() - id(thelight).get_traits().get_min_mireds()) / (id(thelight).get_traits().get_max_mireds() - id(thelight).get_traits().get_min_mireds()));
+
+  - platform: rgbww
+    id: on_value_light
+    icon: mdi:lightbulb-alert-outline
+    name: "LIGHT - ON STATE"
+    red: bit_bucket
+    green: bit_bucket
+    blue: bit_bucket
+    warm_white: bit_bucket
+    cold_white: bit_bucket
+    entity_category: config
+    default_transition_length: 0s
+    restore_mode: RESTORE_DEFAULT_ON
+    effects: !include effects.yaml
+    on_state:
+      - script.execute: copy_vals
+    initial_state:
+      state: on
+      color_mode: color_temperature
+      brightness: 80%
+      color_temperature: 350 mireds   # ~2850K warm white
+
+script:
+  - id: apply_on_value
+    mode: restart
+    then:
+      - lambda: |-
+          auto call = id(thelight).make_call();
+          auto state = id(on_value_light).current_values;
+
+          call.set_state(true);                 // Turn light on
+          call.set_brightness(state.get_brightness());
+
+          if (state.get_color_mode() == esphome::light::ColorMode::RGB) {
+            call.set_rgb(state.get_red(), state.get_green(), state.get_blue());
+          }
+          if (state.get_color_mode() == esphome::light::ColorMode::COLOR_TEMPERATURE) {
+            call.set_color_temperature(state.get_color_temperature());
+          }
+
+          call.perform();
+
+number:
+  - platform: template
+    name: Color Temperature
+    id: number_color_temperature
+    #internal: true
+    disabled_by_default: true
+    entity_category: config
+    icon: "mdi:temperature-kelvin"
+    mode: slider
+    min_value: 0.0
+    max_value: 1.0
+    step: 0.01
+    update_interval: never
+    lambda: return (id(thelight).remote_values.get_color_temperature() - id(thelight).get_traits().get_min_mireds()) / (id(thelight).get_traits().get_max_mireds() - id(thelight).get_traits().get_min_mireds());
+    set_action:
+      - light.control:
+          id: thelight
+          color_temperature: !lambda return id(thelight).get_traits().get_min_mireds() + (x * (id(thelight).get_traits().get_max_mireds() - id(thelight).get_traits().get_min_mireds()));

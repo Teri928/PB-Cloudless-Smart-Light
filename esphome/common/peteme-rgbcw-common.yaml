@@ -7,7 +7,7 @@ substitutions:
   light_restore_mode: "RESTORE_AND_OFF"
 
 packages:
-  light-effects-config: !include ../common/light-effects-config.yaml # Default light effects config
+  light-effects-config: !include light-effects-config.yaml # Default light effects config
   wifi-boot-script-common: !include wifi-boot-script-common.yaml
 
 bk72xx:
@@ -57,7 +57,7 @@ light:
     blue: output_blue
     cold_white: output_cold
     warm_white: output_warm
-    effects: !include ../common/light-effects-common-list.yaml
+    effects: !include light-effects-common-list.yaml
 
 # text_sensor:  #mostly obsolete. Debug device info reports the same stuff
 #   # Reports the LibreTiny Versions with compile date

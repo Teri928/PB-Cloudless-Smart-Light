@@ -1,0 +1,37 @@
+# Base config components
+substitutions:
+#project info
+  project_name: PB.RGBCW_Cloudless_Bulb # Project info. The format of the name should be 'author_name.project_name'
+  project_ver_num: "1.0"
+  project_ver_let: a
+#ESP device info
+  device_name: pb-bulb
+  friendly_name: PB Cloudless Bulb
+  device_description: "RGBCW A19 smart bulb. Self-hosted, cloudless."
+  web_server_show_internal: "false" # default false, set in parent config
+
+packages:
+  base-common: !include common/base-components-common.yaml
+  peteme-rgbcw-bulb-common: !include common/peteme-rgbcw-common.yaml
+
+esphome:
+  name: ${device_name}
+  friendly_name: ${friendly_name}
+  comment: ${device_description}
+  project:  # Project info
+    name: $project_name
+    version: $project_ver_num($project_ver_let)
+
+globals:
+  - id: bulb_name
+    type: std::string
+    restore_value: true
+    initial_value: "PB Factory Bulb"
+
+# Expose friendly name to web server
+text_sensor:
+  - platform: template
+    name: "Bulb Name"
+    id: bulb_name_sensor
+    lambda: 'return id(bulb_name);'
+    update_interval: 10s
