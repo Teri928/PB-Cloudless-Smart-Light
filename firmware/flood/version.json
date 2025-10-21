@@ -1,0 +1,5 @@
+{
+  "latest_version": "1.0.0",
+  "firmware_url": "https://raw.githubusercontent.com/Teri928/PB-Cloudless-Smart-Light/main/firmware/bulb1_1.0.0.bin",
+  "changelog": "Initial release of Cloudless Bulb firmware"
+}
