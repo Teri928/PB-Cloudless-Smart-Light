@@ -1,0 +1,123 @@
+http_request:
+  useragent: esphome-ota
+  timeout: 10s
+
+ota:
+  - platform: http_request
+
+globals:
+  - id: current_version
+    type: std::string
+    restore_value: no
+    initial_value: '"${firmware_version}"'
+  - id: latest_version
+    type: std::string
+    restore_value: no
+    initial_value: '"unknown"'
+  - id: update_available
+    type: bool
+    restore_value: no
+    initial_value: false
+  - id: confirm_update
+    type: bool
+    restore_value: no
+    initial_value: false
+
+interval:
+  - interval: 12h
+    then:
+      - http_request.get:
+          url: !lambda 'return "${fw_version_info_url}";'
+          on_response:
+            then:
+              - lambda: |-
+                  auto json = x;
+                  if (!json.is_null()) {
+                    id(latest_version) = json["latest_version"].as<std::string>();
+                    id(update_available) = (id(latest_version) != id(current_version));
+                    ESP_LOGI("version_check", "Current: %s | Latest: %s | Update? %d",
+                             id(current_version).c_str(),
+                             id(latest_version).c_str(),
+                             id(update_available));
+                  }
+
+text_sensor:
+  - platform: template
+    name: "Current Firmware Version"
+    entity_category: diagnostic
+    lambda: |-
+      return id(current_version).c_str();
+
+  - platform: template
+    name: "Latest Firmware Version (GitHub)"
+    entity_category: diagnostic
+    lambda: |-
+      return id(latest_version).c_str();
+
+binary_sensor:
+  - platform: template
+    name: "Firmware Update Available"
+    entity_category: diagnostic
+    lambda: |-
+      return id(update_available);
+
+button:
+  - platform: template
+    name: "Check Firmware Update"
+    icon: "mdi:cloud-search"
+    entity_category: diagnostic
+    on_press:
+      - http_request.get:
+          url: !lambda 'return "${fw_version_info_url}";'
+          on_response:
+            then:
+              - lambda: |-
+                  auto json = x;
+                  if (!json.is_null()) {
+                    id(latest_version) = json["latest_version"].as<std::string>();
+                    id(update_available) = (id(latest_version) != id(current_version));
+                    ESP_LOGI("version_check", "Manual check - Current: %s | Latest: %s | Update? %d",
+                             id(current_version).c_str(),
+                             id(latest_version).c_str(),
+                             id(update_available));
+                  }
+button:
+  - platform: template
+    name: "Prepare Firmware Update"
+    entity_category: diagnostic
+    icon: "mdi:checkbox-marked-circle-outline"
+    on_press:
+      then:
+        - globals.set:
+            id: confirm_update
+            value: true
+        - logger.log: "Firmware update prepared. Press 'Apply Firmware Update' to flash."
+
+  - platform: template
+    name: "Apply Firmware Update"
+    entity_category: diagnostic
+    icon: "mdi:cloud-upload"
+    on_press:
+      then:
+        - if:
+            condition:
+              lambda: 'return id(update_available) && id(confirm_update);'
+            then:
+              - ota.http_request.flash:
+                  url: !lambda 'return "${firmware_url}";'
+              - logger.log: "Firmware update triggered!"
+              - globals.set:
+                  id: confirm_update
+                  value: false
+            else:
+              - logger.log: "Update not applied: either not available or not confirmed."
+
+  - platform: template
+    name: "Cancel Firmware Update"
+    entity_category: diagnostic
+    on_press:
+      then:
+        - globals.set:
+            id: confirm_update
+            value: false
+        - logger.log: "Firmware update canceled."

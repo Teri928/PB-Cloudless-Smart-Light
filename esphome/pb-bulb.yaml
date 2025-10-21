@@ -9,6 +9,10 @@ substitutions:
   friendly_name: PB Cloudless Bulb
   device_description: "RGBCW A19 smart bulb. Self-hosted, cloudless."
   web_server_show_internal: "false" # default false, set in parent config
+#firmware info
+  firmware_version: "${project_ver_num}(${project_ver_let})"
+  fw_version_info_url: "https://raw.githubusercontent.com/Teri928/PB-Cloudless-Smart-Light/refs/heads/main/firmware/bulb/version.json"
+  fw_update_url: ""
 
 packages:
   base-common: !include common/base-components-common.yaml

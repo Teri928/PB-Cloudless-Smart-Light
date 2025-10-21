@@ -2,6 +2,7 @@ packages:
   globals-common: !include globals-common.yaml
   web-server-common: !include web-server-common.yaml
   Diagnostic-common: !include diagnostic-entities-common.yaml
+  http-update-common: !include http-ota-update-common.yaml
 
 logger:
 api:
