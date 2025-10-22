@@ -81,7 +81,7 @@ button:
                              id(latest_version).c_str(),
                              id(update_available));
                   }
-button:
+
   - platform: template
     name: "Prepare Firmware Update"
     entity_category: diagnostic
