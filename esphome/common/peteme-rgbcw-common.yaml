@@ -13,12 +13,6 @@ packages:
 bk72xx:
   board: wb3l
 
-esphome:
-  # name: petemebulb-rgbcw
-  project:  # Project info
-    name: $project_name
-    version: $project_ver_num($project_ver_let)
-
 # Output components
 output:
   - platform: libretiny_pwm
