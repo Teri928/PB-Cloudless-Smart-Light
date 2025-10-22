@@ -1,0 +1,145 @@
+### PACKAGE FILE - MUST LOAD AS PACKAGE: ###
+## LIGHT EFFECTS CONFIG MASTER FILE ##  include as package file to any light
+substitutions:
+# Max brightness ON ALL PWM MASTER CHANNELS
+  max_brightness_pwm: "0.80"  # Decimal between 1 and 0
+
+# Soft flicker
+  flicker_alpha: "96%"  #The percentage that the last color value should affect the light. More or less the “forget-factor” of an exponential moving average. Defaults to 95%.
+  flicker_intensity: "0.7%" #The intensity of the flickering, basically the maximum amplitude of the random offsets. Defaults to 1.5%.
+
+# Heartbeat CONFIG
+# Normal
+  heartbeat_brightness: "0.9"
+  heartbeat_background: "0.1"
+  heartbeat_pulse_ms: "250"
+  heartbeat_pause_between_ms: "180"
+  heartbeat_pause_after_ms: "1600"
+  heartbeat_update_interval: "60"
+  heartbeat_transition_ms: "300"  # optional for smoother fading
+# PANIC
+  panic_heartbeat_brightness: "1.0"
+  panic_heartbeat_background: "0.05"
+  panic_heartbeat_pulse_ms: "180"
+  panic_heartbeat_pause_between_ms: "120"
+  panic_heartbeat_pause_after_ms: "400"
+  panic_heartbeat_update_interval: "50"
+  panic_heartbeat_transition_ms: "200"  # optional for smoother fading
+
+# Breathe Config
+  breathe_update_interval: "8s"
+  breathe_transition_ms: "8000"
+  breathe_max_brightness: "0.92"
+  breathe_min_brightness: "0.18"
+
+# Candle flicker
+  candle_base_brightness: "0.85"     # typical brightness level of the flame
+  candle_flicker_range: "0.06"      # amount of random flickering per frame (±range)
+  candle_update_interval: "250ms"   # how often the flicker updates
+  candle_transition_ms: "250"       # fade duration (usually = update_interval)
+  candle_gust_chance_percent: "3"   # % chance of a flicker gust happening per frame
+
+# Haunted House
+  haunted_flicker_update_interval: 150ms      # slower updates for smoother motion
+  haunted_flicker_idle_brightness: "0.45"     # base flicker level
+  haunted_flicker_max_brightness: "0.8"       # max flicker spike
+  haunted_flicker_burst_wait_min: "10"        # minimum idle ticks between flickers
+  haunted_flicker_burst_wait_range: "20"      # variability in idle time
+  haunted_flicker_transition_ms: "180"        # smoother transitions
+  haunted_flicker_blackout_chance: "2"        # % chance per idle cycle to blackout
+  haunted_flicker_blackout_duration: "10"     # how long the light stays off in blackout
+
+# Lightning Strike
+  lightning_update_interval: "100ms"
+  lightning_transition_ms: "80"
+  lightning_flash_chance_percent: "2"
+  lightning_burst_min: "3"
+  lightning_burst_range: "3"
+  lightning_cooldown_min: "30"
+  lightning_cooldown_range: "50"
+
+# Color Strike
+  chaos_update_interval: "125ms"
+  chaos_transition_ms: "75"
+  chaos_flash_chance_percent: "5"
+  chaos_burst_min: "2"
+  chaos_burst_range: "4"
+  chaos_cooldown_min: "10"
+  chaos_cooldown_range: "25"
+
+# Magic (Color) Surge
+  surge_update_interval: "120"
+  surge_transition_ms: "80"
+  surge_flash_chance: "10"         # %
+  surge_flash_brightness: "1.0"
+  surge_idle_brightness: "0.3"
+  surge_cooldown_min: "2"
+  surge_cooldown_range: "4"
+
+# Cinematic Storm Cloud
+  storm_update_interval: "80"          # tick speed in milliseconds
+  small_flash_chance: "5"             # % chance per tick
+  medium_flash_chance: "2.2"
+  big_flash_chance: "0.85"
+  small_brightness: "0.25"
+  medium_brightness: "0.5"
+  big_brightness: "1.0"
+  small_duration: "1"
+  medium_duration: "2"
+  big_duration: "3"
+  storm_transition_ms: "60"
+
+# Lightsaber Pulsating
+  lightsaber_update_interval: "0.11s"         # ms between updates
+  lightsaber_brightness_min: "81%"        # min brightness
+  lightsaber_brightness_max: "89%"        # max brightness
+  lightsaber_transition: "0.11s"           # should match update_interval for smoothness
+
+# ======== CONFIGURABLE EFFECT CONTROLS ========
+number:
+  - platform: template
+    name: "Effect Speed"
+    id: effect_speed
+    optimistic: true
+    min_value: 1
+    max_value: 100
+    step: 1
+    initial_value: 50
+    restore_value: true
+    icon: mdi:speedometer
+    entity_category: config
+
+  - platform: template
+    name: "Effect Intensity"
+    id: effect_intensity
+    optimistic: true
+    min_value: 1
+    max_value: 100
+    step: 1
+    initial_value: 50
+    restore_value: true
+    icon: mdi:brightness-6
+    entity_category: config
+
+## GENERATE RANDOM UNIQUE EFFECT SEED FROM LAST BYTE OF MAC ADDRESS ##
+esphome:
+  on_boot:
+    priority: -100
+    then:
+      - lambda: |-
+          auto mac_str = get_mac_address();
+          ESP_LOGI("seed", "Raw MAC Address: %s", mac_str.c_str());
+
+          // Remove any colons
+          std::string mac_clean;
+          for (char c : mac_str) {
+            if (c != ':') mac_clean += c;
+          }
+
+          if (mac_clean.size() == 12) {
+            uint32_t seed = (uint32_t) strtoul(mac_clean.substr(6, 6).c_str(), nullptr, 16);
+            srand(seed);
+            ESP_LOGI("seed", "Seeded rand() with MAC-derived value: %u", seed);
+          } else {
+            ESP_LOGW("seed", "MAC address string too short (%d chars), skipping srand", mac_clean.size());
+          }
