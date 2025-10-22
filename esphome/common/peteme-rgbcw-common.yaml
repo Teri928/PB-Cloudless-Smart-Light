@@ -7,7 +7,7 @@ substitutions:
   light_restore_mode: "RESTORE_AND_OFF"
 
 packages:
-  light-effects-config: !include light-effects-config.yaml # Default light effects config
+  # light-effects-config: !include light-effects-config.yaml # Default light effects config
   wifi-boot-script-common: !include wifi-boot-script-common.yaml
 
 bk72xx:
