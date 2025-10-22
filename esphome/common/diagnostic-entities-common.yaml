@@ -42,14 +42,6 @@ ota:
 debug:
   update_interval: 30s
 
-# Binary sensor - device online
-binary_sensor:
-  - platform: status
-    name: "Status"
-    icon: mdi:check-bold
-    entity_category: diagnostic
-    id: device_status
-
 sensor:
   #Internal board temp
   - platform: internal_temperature

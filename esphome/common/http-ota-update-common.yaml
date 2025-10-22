@@ -1,5 +1,5 @@
 http_request:
-  useragent: esphome-ota
+  # useragent: esphome-ota
   timeout: 10s
 
 ota:

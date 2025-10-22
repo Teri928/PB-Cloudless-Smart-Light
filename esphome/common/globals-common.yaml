@@ -1,4 +1,8 @@
 globals:
+  - id: user_device_name
+    type: std::string
+    restore_value: true
+    initial_value: '"PB Bulb"'
   - id: static_ip
     type: std::string
     restore_value: true

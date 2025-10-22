@@ -14,7 +14,7 @@ bk72xx:
   board: wb3l
 
 esphome:
-  name: petemebulb-rgbcw
+  # name: petemebulb-rgbcw
   project:  # Project info
     name: $project_name
     version: $project_ver_num($project_ver_let)
@@ -47,7 +47,7 @@ output:
 light:
   - platform: rgbww
     id: thelight
-    name: ${friendly_name}
+    name: Bulb
     restore_mode: ${light_restore_mode}
     color_interlock: true
     cold_white_color_temperature: 6500 K
@@ -57,7 +57,7 @@ light:
     blue: output_blue
     cold_white: output_cold
     warm_white: output_warm
-    effects: !include light-effects-common-list.yaml
+    # effects: !include light-effects-common-list.yaml
 
 # text_sensor:  #mostly obsolete. Debug device info reports the same stuff
 #   # Reports the LibreTiny Versions with compile date

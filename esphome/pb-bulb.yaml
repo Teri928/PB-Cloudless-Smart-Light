@@ -20,6 +20,7 @@ packages:
 
 esphome:
   name: ${device_name}
+  name_add_mac_suffix: true
   friendly_name: ${friendly_name}
   comment: ${device_description}
   project:  # Project info

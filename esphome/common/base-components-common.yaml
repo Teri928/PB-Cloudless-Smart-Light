@@ -15,25 +15,30 @@ safe_mode:
 captive_portal:
 wifi:
   ap:
-    ssid: "${device_name}_Setup"
     password: "pb1234"
 mdns: # make bulb announce self "bulb.local"
 
-# Apply static IP at boot
-on_boot:
-  priority: 100
-  then:
-    - lambda: |-
-        if (!id(static_ip).empty()) {
-          IPAddress ip_addr, gw_addr, sn_addr;
-          ip_addr.fromString(id(static_ip).c_str());
-          gw_addr.fromString(id(static_gateway).c_str());
-          if (!id(static_subnet).empty()) sn_addr.fromString(id(static_subnet).c_str());
-          else sn_addr.fromString("255.255.255.0");
-          WiFi.config(ip_addr, gw_addr, sn_addr);
-        }
+# # Apply static IP at boot
+# on_boot:
+#   priority: 100
+#   then:
+#     - lambda: |-
+#         if (!id(static_ip).empty()) {
+#           IPAddress ip_addr, gw_addr, sn_addr;
+#           ip_addr.fromString(id(static_ip).c_str());
+#           gw_addr.fromString(id(static_gateway).c_str());
+#           if (!id(static_subnet).empty()) sn_addr.fromString(id(static_subnet).c_str());
+#           else sn_addr.fromString("255.255.255.0");
+#           WiFi.config(ip_addr, gw_addr, sn_addr);
+#         }
 
 time:
   - platform: sntp
     id: sntp_time
     timezone: "UTC"  # default until user sets it
+
+text_sensor:
+  - platform: template
+    name: "Device Name"
+    lambda: |-
+      return id(user_device_name).c_str();
